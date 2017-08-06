@@ -1,27 +1,34 @@
 module Main where
 
 import Prelude
-import BaseRationals (digitsFromArray, fromString, toString)
-import Flare (UI, runFlare, string, intRange)
+
+import Flare as Flare
+
 import Data.Either(Either(..))
+import BaseRationals (digitsFromArray, fromString, toString)
 
-digitArray =
-    ['0', '1', '2', '3', '4', '5', '6', '7','8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
-conversion s inputBase outputBase = do
+digitArray :: Array Char
+digitArray = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F']
+
+conversion :: String -> Int -> Int -> Either String String
+conversion inString inBase outBase = do
     digits <- digitsFromArray digitArray
-    r <- fromString digits inputBase s
-    toString digits outputBase r
+    ratio <- fromString digits inBase inString
+    toString digits outBase ratio
 
 render :: String -> Int -> Int -> String
-render s inputBase outputBase =
-    case conversion s inputBase outputBase of
+render inString inBase outBase =
+    case conversion inString inBase outBase of
         Left error -> error
         Right string -> string
 
-flare :: forall eff. UI eff String
-flare = render <$> string "Input" "0"
-               <*> intRange "Input Basis" 2 16 10
-               <*> intRange "Output Basis" 2 16 10
+flare :: forall eff. Flare.UI eff String
+flare = render
+    <$> Flare.string "Input" "0"
+    <*> Flare.intRange "Input Basis" 2 16 10
+    <*> Flare.intRange "Output Basis" 2 16 10
 
-main = runFlare "input" "output" flare
+
+main :: _
+main = Flare.runFlare "input" "output" flare
